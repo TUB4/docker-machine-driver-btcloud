@@ -15,16 +15,16 @@ import (
 
 type Driver struct {
 	*drivers.BaseDriver
-	VmId							string
-	Endpoint					string
-	APIKey						string
-	SecretKey					string
-	VerifySSL					bool
-	Zone							string
-	Template					string
+	VmId			string
+	Endpoint		string
+	APIKey			string
+	SecretKey		string
+	VerifySSL		bool
+	Zone			string
+	Template		string
 	ServiceOffering		string
-	IPAddress					string	
-	SSHKeypair				string
+	IPAddress		string	
+	SSHKeypair		string
 }
 
 func NewDriver(hostName, storePath string) *Driver {
@@ -122,8 +122,8 @@ func (d *Driver) DriverName() string {
 func (d *Driver) Create() error {
 	
 	// <TO DO = Automate and fix mapping>
-	zoneId						:= d.Zone
-	templateId				:= d.Template
+	zoneId := d.Zone
+	templateId := d.Template
 	serviceOfferingId := d.ServiceOffering
 	// </TO DO>
 	
@@ -162,7 +162,7 @@ func (d *Driver) Create() error {
 	ipService := cloudstack.NewAddressService(client)
 	ipParams := ipService.NewListPublicIpAddressesParams()
 	ipParams.SetAssociatednetworkid(networkId)
-	ipResp, err :=  ipService.ListPublicIpAddresses(ipParams)
+	ipResp, err := ipService.ListPublicIpAddresses(ipParams)
 	if err != nil {
 		 return err
 	}
