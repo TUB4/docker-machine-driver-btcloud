@@ -181,7 +181,7 @@ func (d *Driver) Create() error {
 }
 
 func (d *Driver) GetState() (state.State, error) {
-	time.Sleep(2000) // Give CloudStack some time
+	time.Sleep(3000) // Give CloudStack networking some time
 	vm, err := d.getVmByID(d.VmId)
 	if err != nil {
 		return state.Error, err
@@ -232,8 +232,7 @@ func (d *Driver) Restart() error {
 }
 
 func (d *Driver) Kill() error {
-	log.Debugf( ">>> Kill(TO DO)")
-	return nil
+	return d.Stop()
 }
 
 func (d *Driver) Stop() error {
@@ -242,8 +241,22 @@ func (d *Driver) Stop() error {
 }
 
 func (d *Driver) Remove() error {
-	log.Debugf( ">>> Remove(TO DO)")
-	return nil
+	log.Debugf("Destroying virtual machine %s", d.VmId)
+	client := cloudstack.NewClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
+	vmService := cloudstack.NewVirtualMachineService(client)
+	vmParams := vmService.NewDestroyVirtualMachineParams(d.VmId)
+	vmParams.SetExpunge(true)
+	_, err := vmService.DestroyVirtualMachine(vmParams)
+	if err != nil {
+		 return err
+	}
+	
+	log.Debugf("Destroying SSH keypair")
+	kpService := cloudstack.NewSSHService(client)
+	kpParams := kpService.NewDeleteSSHKeyPairParams(d.SSHKeypair)
+	_, err = kpService.DeleteSSHKeyPair(kpParams)
+
+	return err
 }
 
 func (d *Driver) getVmByID(id string) (vm *cloudstack.VirtualMachine, err error) {
