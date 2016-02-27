@@ -90,7 +90,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 
 func (d *Driver) checkConfig() error {
 	if d.Endpoint == "" {
-		d.Endpoint = "https://cloud.btcompute.bt.com/client/api"
+		d.Endpoint = "https://cloud.bt.com/client/api"
 	}
 	if d.APIKey == "" {
 		return fmt.Errorf("Please specify an API key (--btcloud-api-key).")
@@ -127,7 +127,7 @@ func (d *Driver) Create() error {
 	serviceOfferingId := d.ServiceOffering
 	// </TO DO>
 	
-	client := cloudstack.NewClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
+	client := cloudstack.NewAsyncClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
 	randomKey := mcnutils.TruncateID(mcnutils.GenerateRandomID())
 	d.SSHKeypair = fmt.Sprintf("%s-%s", d.MachineName, randomKey)
 	kpService := cloudstack.NewSSHService(client)
@@ -156,6 +156,7 @@ func (d *Driver) Create() error {
 	if err != nil {
 		 return err
 	}
+	time.Sleep(3000) // Give CloudStack some time
 	networkId := vm.Nic[0].Networkid
 	log.Debugf("VM / Network ID = %s / %s", d.VmId, networkId)
 
@@ -181,7 +182,6 @@ func (d *Driver) Create() error {
 }
 
 func (d *Driver) GetState() (state.State, error) {
-	time.Sleep(3000) // Give CloudStack networking some time
 	vm, err := d.getVmByID(d.VmId)
 	if err != nil {
 		return state.Error, err
@@ -222,13 +222,23 @@ func (d *Driver) GetURL() (string, error) {
 }
 
 func (d *Driver) Start() error {
-	log.Debugf(">>> Start(TO DO)")
-	return nil
+	log.Debugf("Starting virtual machine %s", d.VmId)
+	client := cloudstack.NewClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
+	vmService := cloudstack.NewVirtualMachineService(client)
+	vmParams := vmService.NewStartVirtualMachineParams(d.VmId)
+	_, err := vmService.StartVirtualMachine(vmParams)
+
+	return err
 }
 
 func (d *Driver) Restart() error {
-	log.Debugf(">>> Restart(TO DO)")
-	return nil
+	log.Debugf("Restarting virtual machine %s", d.VmId)
+	client := cloudstack.NewClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
+	vmService := cloudstack.NewVirtualMachineService(client)
+	vmParams := vmService.NewRebootVirtualMachineParams(d.VmId)
+	_, err := vmService.RebootVirtualMachine(vmParams)
+	
+	return err
 }
 
 func (d *Driver) Kill() error {
@@ -236,8 +246,13 @@ func (d *Driver) Kill() error {
 }
 
 func (d *Driver) Stop() error {
-	log.Debugf( ">>> Stop(TO DO)")
-	return nil
+	log.Debugf("Stopping virtual machine %s", d.VmId)
+	client := cloudstack.NewClient(d.Endpoint, d.APIKey, d.SecretKey, d.VerifySSL)
+	vmService := cloudstack.NewVirtualMachineService(client)
+	vmParams := vmService.NewStopVirtualMachineParams(d.VmId)
+	_, err := vmService.StopVirtualMachine(vmParams)
+
+	return err
 }
 
 func (d *Driver) Remove() error {
