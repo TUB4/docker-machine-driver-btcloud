@@ -10,10 +10,10 @@ This package is incomplete. It can be used to create and destroy docker machines
 - [ ] Map zone, template & service offering IDs to names.
 - [ ] Update checkConfig( ) for the latter.
 - [x] Add Destroy( ) function.
-- [ ] Add Start( ) function.
-- [ ] Add Restart( ) function.
+- [x] Add Start( ) function.
+- [x] Add Restart( ) function.
 - [x] Add Kill( ) function.
-- [ ] Add Stop( ) function.
+- [x] Add Stop( ) function.
 
 ### Known issues
 
