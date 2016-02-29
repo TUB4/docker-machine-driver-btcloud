@@ -1,9 +1,13 @@
 # BT Cloud Compute driver for Docker Machine
 
+### Please note:
+For convenience, this package contains option defaults that are specific to the [BT Cloud Compute](http://www.globalservices.bt.com/uk/en/products/cloud_compute) cloud platform. If you are targeting other [ACS]( https://cloudstack.apache.org/
+) platforms you may wish to consider using the [generic CloudStack driver](https://github.com/TUB4/docker-machine-driver-cloudstack).
+
 ## Status
 _*** WORK IN PROGRESS ***_
 
-This package is incomplete. It can be used to create and destroy docker machines though.
+This package is incomplete. At present, service-related parameters _(zone, template, service offering)_ must be passed as CloudStack UUIDs. It can be used to create, control and destroy docker machines.
 
 ### To do:
 
